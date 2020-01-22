@@ -49,6 +49,10 @@ class BaseEndpoint(object):
 
     @property
     def logger(self):
+        '''
+        __name__ : drchrono.endpoints'
+        self.endpoint : patients
+        '''
         name = "{}.{}".format(__name__, self.endpoint)
         return logging.getLogger(name)
 
@@ -185,7 +189,7 @@ class AppointmentEndpoint(BaseEndpoint):
     endpoint = "appointments"
 
     # Special parameter requirements for a given resource should be explicitly called out
-    def list(self, params=None, date=None, start=None, end=None, **kwargs):
+    def list(self, params='None', date=None, start=None, end=None, **kwargs):
         """
         List appointments on a given date, or between two dates
         """
@@ -216,3 +220,6 @@ class DoctorEndpoint(BaseEndpoint):
 
 class AppointmentProfileEndpoint(BaseEndpoint):
     endpoint = "appointment_profiles"
+
+class OfficeEndpoint(BaseEndpoint):
+    endpoint = "offices"

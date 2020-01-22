@@ -1,11 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Welcome to drchrono</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- Css -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Font Awesome Icons-->
+    <script src="https://kit.fontawesome.com/4db5f1a392.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
-<h1>Welcome {{ doctor.first_name }} {{ doctor.last_name }}</h1>
-{{ doctor }}
+
+    <div class="container">
+        <br>
+        <div class="jumbotron">
+            <h1 class="display-4">{{ doctor.first_name }} {{ doctor.last_name }}</h1>
+            <p class="lead">Welcome to your personal DrChrono management panel!</p>
+            <hr class="my-4">
+            <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+            <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+        </div>
+        <div class="scroll_schedule">
+            <div class="container">
+                <div class="row flex-nowrap">
+                    {% for appointment in appointments %}
+                    <div class="col-sm-auto">
+                        <div class="row">
+                            <div class="card" style="width: {{ appointment.schedule_card_width }}em">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ appointment.patient_details.first_name }} {{ appointment.patient_details.last_name }}</h5>
+                                    <div class="card-text" style="height: 10em">
+                                        <div class="row">
+                                            <span class="fa-stack" style="vertical-align: top; margin-left: 0.5em;">
+                                                <i class="fas fa-circle fa-stack-2x"></i>
+                                                <i class="fas fa-clinic-medical fa-stack-1x fa-inverse"></i>
+                                            </span>
+                                            <div style="margin-left: 0.5em; margin-top: 0.3em;"><p>{{ appointment.office_details.name }}</p></div>
+                                        </div>
+                                        <div class="row">
+                                            <span class="fa-stack" style="vertical-align: top; margin-left: 0.5em;">
+                                                <i class="fas fa-circle fa-stack-2x"></i>
+                                                <i class="fas fa-stethoscope fa-stack-1x fa-inverse"></i>
+                                            </span>
+                                            <div style="margin-left: 0.5em; margin-top: 0.3em;"><p>{{ appointment.exam_room_details.name }}</p></div>
+                                        </div>
+                                        <div class="row">
+                                            <div style="margin-left: 0.5em; margin-top: 0.3em;"><p>{{ appointment.notes }}</p></div>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                                    <div class="row duration">
+                                        <div class="col-6" style="text-align: left">
+                                            <p>
+                                                <span class="fa-stack" style="font-size: 0.5em;">
+                                                    <i class="fas fa-clock fa-stack-2x"></i>
+                                                </span>
+                                                <small>{{ appointment.duration }} min</small>
+                                            </p>
+                                        </div>
+                                        <div class="col-6" style="text-align: right">
+                                            {% if appointment.status == "Arrived" %}
+                                                <span class="badge badge-primary">Arrived</span>
+                                            {% elif appointment.status == "Checked In" %}
+                                                <span class="badge badge-info">Checked In</span>
+                                            {% elif appointment.status == "In Room" %}
+                                                <span class="badge badge-success">In Room</span>
+                                            {% elif appointment.status == "In Session" %}
+                                                <span class="badge badge-info">In Session</span>
+                                            {% elif appointment.status == "Complete" %}
+                                                <span class="badge badge-success">Complete</span>
+                                            {% elif appointment.status == "Confirmed" %}
+                                                <span class="badge badge-info">Confirmed</span>
+                                            {% elif appointment.status == "Not Confirmed" %}
+                                                <span class="badge badge-secondary">Not Confirmed</span>
+                                            {% elif appointment.status == "No Show" %}
+                                                <span class="badge badge-warning">No Show</span>
+                                            {% elif appointment.status == "Rescheduled" %}
+                                                <span class="badge badge-warning">Rescheduled</span>
+                                            {% elif appointment.status == "Cancelled" %}
+                                                <span class="badge badge-danger">Cancelled</span>
+                                            {% else %}
+                                                <span class="badge badge-light">Info N/A</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="row"><div class="triangle-up"></div></div>
+                        <div class="row top_edge"><p><small>{{ appointment.scheduled_time|time:"g:i a"}}</small></p></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br><br><br><br><br><br>
+    <div class="container">
+        <span class="badge badge-primary">Arrived</span>
+        <h1>Test Area {{ doctor.first_name }} {{ doctor.last_name }}</h1>
+        {% now "jS F Y H:i" %}
+        {% for appointment in appointments %}
+        <p>{{ appointment.scheduled_time|time:"g:i a"}} {{ appointment.duration }} {{ appointment.vitals }} </p>
+            {{appointment.notes}}
+        {% endfor %}
+    </div>
 </body>
+
 </html>

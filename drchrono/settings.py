@@ -109,6 +109,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
 
 # TODO: Configure your drchrono.com account's API settings to allow this app access
 # 1) go to https://app.drchrono.com/api-management/

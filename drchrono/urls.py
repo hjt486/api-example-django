@@ -6,10 +6,12 @@ admin.autodiscover()
 
 import views
 
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^setup/$', views.SetupView.as_view(), name='setup'),
     url(r'^welcome/$', views.DoctorWelcome.as_view(), name='setup'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
