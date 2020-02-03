@@ -334,11 +334,7 @@ class ChangeStatus(View):
     def post(self, request, *args, **kwargs):
         context = {}
         context["is_success"] = False   # if success flag to let user know
-        
-        # Status list as options for validation
-        status_list = {"Arrived", "Checked In", "In Room", "Cancelled",
-                "Not Confirmed", "Rescheduled"}
-        
+
         # Form validation
         check_in_form = ChangeStatusForm(request.POST)
         if check_in_form.is_valid():
@@ -353,15 +349,14 @@ class ChangeStatus(View):
             # Sent to server
             new_api_request = APIrequest()
             new_api_request.make_api_request()
-            appointment = check_in_form.cleaned_data["appointment"]
+            appointment = str(check_in_form.cleaned_data["appointment"])
             if appointment in new_api_request.appointments:
-                if status in status_list:
-                    new_api_request.change_appointment(
-                        appointment, api_post_data)
-                    # These are for the views to display message to user
-                    context["is_success"] = True
-                    context["action"] = "change_status"
-                    context["status"] = check_in_form.cleaned_data["status"]
+                new_api_request.change_appointment(
+                    appointment, api_post_data)
+                # These are for the views to display message to user
+                context["is_success"] = True
+                context["action"] = "change_status"
+                context["status"] = check_in_form.cleaned_data["status"]
 
         return render(request, self.template_name, context)
 
@@ -398,6 +393,8 @@ class ChangeAppointmentInfo(View):
             # Contains data to be posted for API
             # Add processed data
             api_post_data = change_app_info_form.cleaned_data
+            api_post_data["appointment"] = str(api_post_data["appointment"])
+            api_post_data["duration"] = str(api_post_data["duration"])
             api_post_data["scheduled_time"] = date_and_time
             api_post_data["office"] = office
             api_post_data["exam_room"] = exam_room
@@ -441,9 +438,10 @@ class ChangePatientInfo(View):
             # Contains data to be posted for API
             # Add processed data
             api_post_data = change_patient_info_form.cleaned_data
-            date_of_birth = api_post_data["year"] + '-' + \
+            date_of_birth = str(api_post_data["year"]) + '-' + \
                 api_post_data["month"] + '-' + \
                 api_post_data["day"]
+            api_post_data["patient"] = str(api_post_data["patient"])
             api_post_data["date_of_birth"] = date_of_birth
             # Remove original form formats that didn't meet API formats
             api_post_data.pop("year")
@@ -519,7 +517,8 @@ class Patient(View):
         name_ssn_form = CheckInNameSSNForm(request.POST)
         if name_ssn_form.is_valid():
             last_name = name_ssn_form.cleaned_data["last_name"]
-            ssn = name_ssn_form.cleaned_data["social_security_number"]
+            # Using str() to conver number/integer field to string
+            ssn = str(name_ssn_form.cleaned_data["social_security_number"])
             # Find the patient and his/her appointment
             appointment = self.new_api_request.find_patient(last_name, ssn)
             if appointment:
