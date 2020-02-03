@@ -23,19 +23,19 @@ Interfaces:
 
 All pages uses [Bootstrap 4](https://getbootstrap.com) and icons from[Front Awesome](https://fontawesome.com), and main interfaces are:
 
-![](./README.assets/FireShot Capture 001 - Welcome to DrChrono - localhost.png)
+![](./README.assets/001.png)
 
 
 
-![](./README.assets/FireShot Capture 002 - Welcome to DrChrono - localhost.png)
+![](./README.assets/002.png)
 
 
 
-![](./README.assets/FireShot Capture 004 - Welcome to DrChrono - localhost.png)
+![](./README.assets/003.png)
 
 
 
-![](./README.assets/FireShot Capture 005 - Welcome to DrChrono - localhost.png)
+![](./README.assets/004.png)
 
 #### Demo:
 
