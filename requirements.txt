@@ -1,3 +1,4 @@
+python==3.8.1
 Django==1.11.23
 oauth==1.0.1
 oauth2==1.5.211

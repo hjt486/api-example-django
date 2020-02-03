@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to drchrono</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- Font Awesome Icons-->
+    <script src="https://kit.fontawesome.com/4db5f1a392.js" crossorigin="anonymous"></script>
+    <!-- Css -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <br>
+        <div class="jumbotron">
+            {% if is_success %}
+                {% if action == "change_status" %}
+                    <h1 class="display-4">
+                        <span class="fa-stack fa-2x" style="color: MediumSeaGreen; font-size: 0.5em;">
+                            <i class="fas fa-circle fa-stack-2x"></i>
+                            <i class="fas fa-check fa-stack-1x fa-inverse"></i>
+                        </span>
+                        {{ status }} Successfully!
+                    </h1>
+                    <p class="lead">You will be redirected in 5 seconds or click<a href="/patient">here</a>.</p>
+                    <meta http-equiv="REFRESH" content="5;url=/patient">
+                {% endif %}
+
+                {% if action == "change_appointment_info" %}
+                    <h1 class="display-4">
+                        <span class="fa-stack fa-2x" style="color: MediumSeaGreen; font-size: 0.5em;">
+                            <i class="fas fa-circle fa-stack-2x"></i>
+                            <i class="fas fa-check fa-stack-1x fa-inverse"></i>
+                        </span>
+                        {{ notes }} <br>Successfully!
+                    </h1>
+                    <p class="lead">You will be redirected in 5 seconds or click<a href="/welcome">here</a>.</p>
+                    <meta http-equiv="REFRESH" content="5;url=/welcome">
+                {% endif %}
+
+                {% if action == "change_patient_info" %}
+                    <h1 class="display-4">
+                        <span class="fa-stack fa-2x" style="color: MediumSeaGreen; font-size: 0.5em;">
+                            <i class="fas fa-circle fa-stack-2x"></i>
+                            <i class="fas fa-check fa-stack-1x fa-inverse"></i>
+                        </span>
+                        {{ notes }} Successfully!
+                    </h1>
+                    <p class="lead">You will be redirected in 5 seconds or click<a href="
+                        {% if role == "patient"%}/patient
+                        {% elif role == "doctor"%}/welcome{% endif %}
+                        ">here</a>.</p>
+                    <meta http-equiv="REFRESH" content="5;url=
+                    {% if role == "patient"%}/patient
+                    {% elif role == "doctor"%}/welcome{% endif %}
+                    ">
+                {% endif %}
+
+            {% else %}
+                {% if action == "change_status" %}
+                    <h1 class="display-4">
+                        <span class="fa-stack fa-2x" style="color: Tomato; font-size: 0.5em;">
+                            <i class="fas fa-circle fa-stack-2x"></i>
+                            <i class="fas fa-times fa-stack-1x fa-inverse"></i>
+                        </span>
+                        {{ status }} Failed!
+                    </h1>
+                    <p class="lead">You will be redirected in 5 seconds or click<a href="/patient">here</a>.</p>
+                    <meta http-equiv="REFRESH" content="5;url=/patient">
+                {% endif %}
+
+                {% if action == "change_appointment_info" %}
+                    <h1 class="display-4">
+                        <span class="fa-stack fa-2x" style="color: Tomato; font-size: 0.5em;">
+                            <i class="fas fa-circle fa-stack-2x"></i>
+                            <i class="fas fa-times fa-stack-1x fa-inverse"></i>
+                        </span>
+                        {{ notes }} Failed!
+                    </h1>
+                    <p class="lead">You will be redirected in 5 seconds or click<a href="/welcome">here</a>.</p>
+                    <meta http-equiv="REFRESH" content="5;url=/welcome">
+                {% endif %}
+
+                {% if action == "change_patient_info" %}
+                    <h1 class="display-4">
+                        <span class="fa-stack fa-2x" style="color: Tomato; font-size: 0.5em;">
+                            <i class="fas fa-circle fa-stack-2x"></i>
+                            <i class="fas fa-times fa-stack-1x fa-inverse"></i>
+                        </span>
+                        {{ notes }} Failed!
+                    </h1>
+                    <p class="lead">You will be redirected in 5 seconds or click<a href="
+                        {% if role == "patient"%}/patient
+                        {% elif role == "doctor"%}/welcome{% endif %}
+                        ">here</a>.</p>
+                    <meta http-equiv="REFRESH" content="5;url=
+                    {% if role == "patient"%}/patient
+                    {% elif role == "doctor"%}/welcome{% endif %}
+                    ">
+                {% endif %}
+
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+    </script>
+</body>
+
+</html>

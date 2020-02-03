@@ -23,13 +23,76 @@
 
 .duration {
 	background-color: gainsboro;
-	height: 1.2em;
 	margin-bottom: -1px;
 	margin-top: 1.4em;
 	margin-left: -1.3em;
 	margin-right: -1.35em;
 	margin-bottom: -1.3em;
+}
+
+.type1{
+	min-height: 3em;
+}
+
+.type2{
+	height: 1em;
 	padding-bottom: 1.75em;
 }
 
-  
+.modal-body .sign_badge {
+	margin: 0.3em;
+	margin-bottom: 1em;
+}
+
+.modal-body .input_text_style {
+	min-width: 5em;
+}
+
+.profile_photo {
+	max-width: 8em;
+	max-height: 9em;
+	width: auto; 
+	height: auto"
+}
+
+.no_wrapping{
+	white-space: nowrap;
+}
+
+.checkin{
+	margin: 0.5em;
+	margin-top: 2em;
+}
+
+.btn-primary {
+	border-color: steelblue;
+	background-color: steelblue;
+}
+.btn-success {
+	border-color: MediumSeaGreen;
+	background-color: MediumSeaGreen;
+}
+.btn-danger {
+	border-color: tomato;
+	background-color: tomato;
+}
+.btn-warning {
+	border-color: Khaki;
+	background-color: Khaki;
+}
+
+.only-edge {
+	background-color: transparent;
+}
+
+.modal-content-title {
+	min-width: 10em;
+}
+
+.tiny-margin {
+	margin: -1em;
+}
+
+.btn-xl {
+	width: 10em;
+}

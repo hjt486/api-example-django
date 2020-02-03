@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <br>
+        <div class="jumbotron">
+            {% if request.POST %}
+                {% if not appointment %}
+                    <h1 class="display-4" style="color:orangered;">
+                        Appointment not found!
+                    </h1>
+                    <p class="lead">Please check the name and SSN again, or you don't have appointment currently.
+                    </p>
+                    <p>you will be redirected in 5 seconds or click <a href="">here</a>.</p>
+                    <meta http-equiv="REFRESH" content="5;url=">
+                {% else %}
+                <h1 class="display-4">
+                    Hi
+                    {{ appointment.patient_details.first_name }}
+                    {{ appointment.patient_details.last_name }}!
+                </h1>
+                <p class="lead">Please check your information, if it's correct, click "Check-In" to continue:</p>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <h5 class="card-header">Appointment Information</h5>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-12 no_wrapping">
+                                        <p>
+                                            <span class="fa-stack" style="margin-left: 0.5em; color: steelblue">
+                                                <i class="fas fa-circle fa-stack-2x"></i>
+                                                <i class="fas fa-user-md fa-stack-1x fa-inverse"></i>
+                                            </span>
+                                            Dr. {{ appointment.doctor_details.first_name }} {{ appointment.doctor_details.last_name }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6 no_wrapping">
+                                        <p>
+                                            <span class="fa-stack" style="margin-left: 0.5em; color: steelblue">
+                                                <i class="fas fa-circle fa-stack-2x"></i>
+                                                <i class="fas fa-clinic-medical fa-stack-1x fa-inverse"></i>
+                                            </span>
+                                            {{ appointment.office_details.name }}
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-6 no_wrapping">
+                                        <p>
+                                            <span class="fa-stack" style="margin-left: 0.5em; color: steelblue">
+                                                <i class="fas fa-circle fa-stack-2x"></i>
+                                                <i class="fas fa-stethoscope fa-stack-1x fa-inverse"></i>
+                                            </span>
+                                            {{ appointment.exam_room_details.name }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6 no_wrapping">
+                                        <p>
+                                            <span class="fa-stack" style="margin-left: 0.5em; color: steelblue">
+                                                <i class="fas fa-circle fa-stack-2x"></i>
+                                                <i class="fas fa-clock fa-stack-1x fa-inverse"></i>
+                                            </span>
+                                            {{ appointment.scheduled_time|time:"g:i a"}}
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-6 no_wrapping">
+                                        <p>
+                                            <span class="fa-stack" style="margin-left: 0.5em; color: steelblue">
+                                                <i class="fas fa-circle fa-stack-2x"></i>
+                                                <i class="fas fa-stopwatch fa-stack-1x fa-inverse"></i>
+                                            </span>
+                                            {{ appointment.duration }} min
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="row duration type1">
+                                    <div class="col-sm-4" style="margin-top: 0.5em;">
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#my_info">
+                                            My Information
+                                        </button>
+                                    </div>
+                                    <div class="col-sm-8" style="text-align: right; margin-top: 0.65em; margin-bottom: 0.35em;">
+                                        {% if appointment.status == "Arrived" %}
+                                            <span class="badge badge-primary">Arrived</span>
+                                        {% elif appointment.status == "Checked In" %}
+                                            <span class="badge badge-info">Checked In</span>
+                                        {% elif appointment.status == "In Room" %}
+                                            <span class="badge badge-success">In Room</span>
+                                        {% elif appointment.status == "In Session" %}
+                                            <span class="badge badge-info">In Session</span>
+                                        {% elif appointment.status == "Complete" %}
+                                            <span class="badge badge-success">Complete</span>
+                                        {% elif appointment.status == "Confirmed" %}
+                                            <span class="badge badge-info">Confirmed</span>
+                                        {% elif appointment.status == "Not Confirmed" %}
+                                            <span class="badge badge-secondary">Not Confirmed</span>
+                                        {% elif appointment.status == "No Show" %}
+                                            <span class="badge badge-warning">No Show</span>
+                                        {% elif appointment.status == "Rescheduled" %}
+                                            <span class="badge badge-warning">Rescheduled</span>
+                                        {% elif appointment.status == "Cancelled" %}
+                                            <span class="badge badge-danger">Cancelled</span>
+                                        {% else %}
+                                            <span class="badge badge-light">Info N/A</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <div class="row checkin">
+                <div class="col-12" style="text-align: right;">
+                    {% if appointment.status == "Checked In" %}
+                    <form action="/change_status/" method="POST"> {% csrf_token %}
+                        <input type="hidden" name="appointment" value="{{ appointment.id }}">
+                        <input type="hidden" name="status" value="Cancelled">
+                        <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#confirm_cancel">
+                            Cancel Appointment
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" style="text-align: left;" id="confirm_cancel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalCenterTitle">Cancel Appointment</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                </div>
+                                <div class="modal-body">
+                                    <h4>Are you sure to cancel the appointment?</h4>
+                                    <p>You can still re-check in before <span style="color: orange;"><strong>{{ appointment.scheduled_time|time:"g:i a"}}</strong></span></p>
+                                    </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <input type="submit" class="btn btn-danger" value="Confirm"/>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </form>
+                    {% else %}
+                    <form action="/change_status/" method="POST"> {% csrf_token %}
+                        <input type="hidden" name="appointment" value="{{ appointment.id }}">
+                        <input type="hidden" name="status" value="Checked In">
+                        <input type="submit" class="btn btn-success btn-lg" value="Check In"/>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% else %}
+            <form method="POST"> {% csrf_token %}
+                <h1 class="display-4">Welcome to DrChrono!</h1>
+                <p class="lead">Please fill your last name and the last 4 digits of your SSN below to check in:</p>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Last Name</span>
+                            </div>
+                            <input type="text" class="form-control" name="last_name" placeholder="Your Last Name" aria-label="last_name" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Last 4 digits of SSN</span>
+                            </div>
+                            <input type="password" class="form-control" name="social_security_number" placeholder="Your last 4 digits of your SSN" aria-label="social_security_number" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+                <div class="row checkin">
+                    <div class="col-12" style="text-align: right;">
+                        <input type="submit" class="btn btn-primary btn-lg" value="Find Me"/>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+            <!-- Modal1 -->
+            <div class="modal fade" id="my_info" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <form action="/change_patient_info/" method="POST"> {% csrf_token %}
+                    <input type="hidden" name="patient" value="{{ appointment.patient_details.id }}">
+                    <input type="hidden" name="role" value="patient">
+                    <div class="modal-header">
+                        <h5>Patient Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-sm-4 justify-content-center d-flex align-items-center">
+                                    <div class="profile_photo" style="margin-bottom: 1em">
+                                        <img src="{{ appointment.patient_details.patient_photo }}" class="rounded mx-auto d-block profile_photo" alt="Profile Photo">
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="form-group row">
+                                        <label class="col-sm-5 col-form-label" for="exampleFormControlSelect1">First Name:</label>
+                                        <input type="text" value={{ appointment.patient_details.first_name }} class="col-sm-7 form-control" id="formGroupExampleInput" name="first_name" placeholder="First Name">
+                                    </div>
+                                    
+                                    <div class="form-group row">
+                                        <label class="col-sm-5 col-form-label" for="exampleFormControlSelect1">Last Name:</label>
+                                        <input type="text" value={{ appointment.patient_details.last_name }} class="col-sm-7 form-control" id="formGroupExampleInput" name="last_name" placeholder="Last Name">
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-5 col-form-label" for="exampleFormControlSelect1">Gender:</label>
+                                        <select class="form-control col-sm-7" id="inputGroupSelect02" name="gender">
+                                            <option selected value="{{ appointment.patient_details.gender}}">{{ appointment.patient_details.gender }}</option>
+                                            {% if appointment.patient_details.gender != "Male" %}
+                                                <option value="Male">Male</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.gender != "Female" %}
+                                                <option value="Female">Female</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.gender != "Other" %}
+                                                <option value="Other">Other</option>
+                                            {% endif %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label" for="exampleFormControlSelect1">Date of Birth:</label>
+                                        <select class="form-control col-sm-2" id="inputGroupSelect02" name="month">
+                                            <option selected value="{{ appointment.patient_details.date_of_birth|slice:"5:7" }}">
+                                                {% if appointment.patient_details.date_of_birth|slice:"5:7" == "01"%}Jan
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "02"%}Feb
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "03"%}Mar
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "04"%}Apr
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "05"%}May
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "06"%}Jun
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "07"%}Jul
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "08"%}Aug
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "09"%}Sep
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "10"%}Oct
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "11"%}Nov
+                                                {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "12"%}Dec
+                                                {% endif %}
+                                            </option>
+                                            <option value="01">Jan</option>
+                                            <option value="02">Feb</option>
+                                            <option value="03">Mar</option>
+                                            <option value="04">Apr</option>
+                                            <option value="05">May</option>
+                                            <option value="06">Jun</option>
+                                            <option value="07">Jul</option>
+                                            <option value="08">Aug</option>
+                                            <option value="09">Sep</option>
+                                            <option value="10">Oct</option>
+                                            <option value="11">Nov</option>
+                                            <option value="12">Dec</option>
+                                        </select>
+                                        <select class="form-control col-sm-3" id="inputGroupSelect02" name="day">
+                                            <option selected value="{{ appointment.patient_details.date_of_birth|slice:"8:10" }}">{{ appointment.patient_details.date_of_birth|slice:"8:10" }}</option>
+                                            <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option>
+                                            <option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option>
+                                            <option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                                            <option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="15">15</option>
+                                            <option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="19">19</option>
+                                            <option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option>
+                                            <option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option>
+                                            <option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                                        </select>
+                                        <input type="text" value="{{ appointment.patient_details.date_of_birth|slice:"0:4" }}" class="col-sm-3 form-control" id="formGroupExampleInput" name="year">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="input-group input-group mb-3">
+                                        <div class="input-group-prepend">
+                                        <span class="input-group-text input_text_style" style="width: 7em;" id="inputGroup-sizing">Email:</span>
+                                        </div>
+                                        <input name="email" value="{{ appointment.patient_details.email }}" type="email" class="form-control" placeholder="Email" aria-label="email" aria-describedby="inputGroup-sizing">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="input-group input-group mb-3">
+                                        <div class="input-group-prepend">
+                                        <span class="input-group-text input_text_style" style="width: 7em;" id="inputGroup-sizing">Cell Phone:</span>
+                                        </div>
+                                        <input name="cell_phone" value="{{ appointment.patient_details.cell_phone }}" type="text" class="form-control" placeholder="Cell Phone" aria-label="cell_phone" aria-describedby="inputGroup-sizing">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="input-group input-group mb-3">
+                                        <div class="input-group-prepend">
+                                        <span class="input-group-text input_text_style" style="width: 7em;" id="inputGroup-sizing">Address:</span>
+                                        </div>
+                                        <input name="cell_phone" value="{{ appointment.patient_details.address }}" type="text" class="form-control" placeholder="Address" aria-label="address" aria-describedby="inputGroup-sizing">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="input-group input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text input_text_style" id="inputGroup-sizing">Ethnicity:</span>
+                                        </div>
+                                        <select class="form-control col-sm-7" id="inputGroupSelect02" name="ethnicity">
+                                            <option selected value="{{ appointment.patient_details.ethnicity}}">
+                                                {% if appointment.patient_details.ethnicity == "blank" %}Blank
+                                                {% elif appointment.patient_details.ethnicity == "hispanic" %}Hispanic
+                                                {% elif appointment.patient_details.ethnicity == "not_hispanic" %}Not Hispanic
+                                                {% elif appointment.patient_details.ethnicity == "declined" %}Declined
+                                                {% endif %}
+                                            </option>
+                                            {% if appointment.patient_details.ethnicity != "blank" %}
+                                                <option value="blank">Blank</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.ethnicity != "hispanic" %}
+                                                <option value="hispanic">Hispanic</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.ethnicity != "not_hispanic" %}
+                                                <option value="not_hispanic">Not Hispanic</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.ethnicity != "declined" %}
+                                                <option value="declined">Declined</option>
+                                            {% endif %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text input_text_style" id="inputGroup-sizing">Race:</span>
+                                        </div>
+                                        <select class="form-control col-sm-7" id="inputGroupSelect02" name="race">
+                                            <option selected value="{{ appointment.patient_details.race}}">
+                                                {% if appointment.patient_details.race == "blank" %}Blank
+                                                {% elif appointment.patient_details.race == "indian" %}Indian
+                                                {% elif appointment.patient_details.race == "asian" %}Asian
+                                                {% elif appointment.patient_details.race == "black" %}Black
+                                                {% elif appointment.patient_details.race == "hawaiian" %}Hawaiian
+                                                {% elif appointment.patient_details.race == "white" %}White
+                                                {% elif appointment.patient_details.race == "declined" %}Declined
+                                                {% endif %}
+                                            </option>
+                                            {% if appointment.patient_details.race != "blank" %}
+                                                <option value="blank">Blank</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.race != "indian" %}
+                                                <option value="indian">Indian</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.race != "asian" %}
+                                                <option value="asian">Asian</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.race != "black" %}
+                                                <option value="black">Black</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.race != "hawaiian" %}
+                                                <option value="hawaiian">Hawaiian</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.race != "white" %}
+                                                <option value="white">White</option>
+                                            {% endif %}
+                                            {% if appointment.patient_details.race != "declined" %}
+                                                <option value="declined">Declined</option>
+                                            {% endif %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 text-center"><h5>Emergency Contact:</h5></div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="input-group input-group mb-3">
+                                        <div class="input-group-prepend fixed-input-label">
+                                        <span class="input-group-text input_text_style" style="width: 6em;" id="inputGroup-sizing">Name:</span>
+                                        </div>
+                                        <input name="emergency_contact_name" value="{{ appointment.patient_details.emergency_contact_name }}" type="text" class="form-control" placeholder="Name" aria-label="emergency_contact_name" aria-describedby="inputGroup-sizing">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="input-group input-group mb-3">
+                                        <div class="input-group-prepend fixed-input-label">
+                                        <span class="input-group-text input_text_style" style="width: 6em;" id="inputGroup-sizing">Phone:</span>
+                                        </div>
+                                        <input name="emergency_contact_phone" value="{{ appointment.patient_details.emergency_contact_phone }}" type="text" class="form-control" placeholder="Phone" aria-label="emergency_contact_phone" aria-describedby="inputGroup-sizing">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="input-group input-group mb-3">
+                                        <div class="input-group-prepend">
+                                        <span class="input-group-text input_text_style" style="width: 6em;" id="inputGroup-sizing">Relation:</span>
+                                        </div>
+                                        <input name="emergency_contact_relation" value="{{ appointment.patient_details.emergency_contact_relation }}" type="text" class="form-control" placeholder="Relation" aria-label="emergency_contact_relation" aria-describedby="inputGroup-sizing">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <span style="color: orange;"><h6>Warning: If you click "Save changes", you need to re-enter the last name and SSN to check in.</h6></span>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+    </div>
+{% endblock %}

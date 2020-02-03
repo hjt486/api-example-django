@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <br>
+        <div class="jumbotron text-center">
+            <h1 class="display-4">
+                Welcome to DrChrono!
+            </h1>
+            <p class="lead">Please select your role to continue:</p>
+            <div class="row d-flex justify-content-sm-center">
+                <div class="col-6-sm" style="width: 50%"><a href="{% url 'social:begin' 'drchrono' %}" class="btn btn-success btn-xl p-4" role="button" aria-pressed="true">I am a <h2>Doctor</h2></a></div>
+                <div class="col-6-sm" style="width: 50%"><a href="/patient" class="btn btn-info btn-xl p-4" role="button" aria-pressed="true">I am a <h2>Patient</h2></a></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

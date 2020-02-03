@@ -1,116 +1,601 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Welcome to drchrono</title>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <!-- Css -->
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <!-- Font Awesome Icons-->
-    <script src="https://kit.fontawesome.com/4db5f1a392.js" crossorigin="anonymous"></script>
-</head>
-
-<body>
-
+{% extends "base.html" %}
+{% block content %}
     <div class="container">
         <br>
         <div class="jumbotron">
             <h1 class="display-4">{{ doctor.first_name }} {{ doctor.last_name }}</h1>
             <p class="lead">Welcome to your personal DrChrono management panel!</p>
-            <hr class="my-4">
-            <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-            <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+
+            {% if wait_time %}
+                <hr class="my-4">
+                <div class="text-center">
+                    Average wait time: <h5 style="display: inline;
+                        color:
+                        {% if wait_time_avg <= 30 %}
+                            MediumSeaGreen
+                        {% elif 30 < wwait_time_avg <= 60 %}
+                            DarkOrange
+                        {% elif 60 < wait_time_avg %}
+                            tomato
+                        {% endif%};
+                    ">{{ wait_time_avg }}</h5> min.
+                </div>
+                <br>
+                
+                <div class="row text-center d-flex justify-content-center align-items-end flex-wrap">
+                    <!--
+                        <div style="width: {{ wait_time_length }}em;">
+                    -->
+                    {% for wait in wait_time %}
+                        <div class="col-1-sm" >
+                            <div style="width: 3em; margin-left: 1em; margin-right: 1em;">
+                                <div class="row">
+                                    <div class="col">
+                                        <small>
+                                            {% if wait.wait_time != None %}
+                                                {{ wait.wait_time }} min
+                                            {% else%}
+                                                Wait time N/A
+                                            {% endif%}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col" style=" margin-left: 1em; margin-right: 1em;
+                                    background-color:
+                                        {% if wait.wait_time <= 30 %}
+                                            MediumSeaGreen
+                                        {% elif 30 < wait.wait_time <= 60 %}
+                                            DarkOrange
+                                        {% elif 60 < wait.wait_time %}
+                                            tomato
+                                        {% endif%};
+                                    height: {% if wait.wait_time != None %}
+                                                {% if wait.wait_time >= 100 %} 100px
+                                                {% elif wait.wait_time <= 5 %} 5px
+                                                {% else%} {{ wait.wait_time }}px
+                                                {% endif%}
+                                            {% endif%};">
+                                    </div>
+                                </div>
+                                <div class="row" style="height: 4em;">
+                                    <div class="col"><small>{{ wait.patient_first_name }} {{ wait.patient_last_name}}</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
         </div>
         <div class="scroll_schedule">
             <div class="container">
-                <div class="row flex-nowrap">
-                    {% for appointment in appointments %}
-                    <div class="col-sm-auto">
-                        <div class="row">
-                            <div class="card" style="width: {{ appointment.schedule_card_width }}em">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ appointment.patient_details.first_name }} {{ appointment.patient_details.last_name }}</h5>
-                                    <div class="card-text" style="height: 10em">
-                                        <div class="row">
-                                            <span class="fa-stack" style="vertical-align: top; margin-left: 0.5em;">
-                                                <i class="fas fa-circle fa-stack-2x"></i>
-                                                <i class="fas fa-clinic-medical fa-stack-1x fa-inverse"></i>
-                                            </span>
-                                            <div style="margin-left: 0.5em; margin-top: 0.3em;"><p>{{ appointment.office_details.name }}</p></div>
+                {% if appointments %}
+                    <div class="row flex-nowrap">
+                        {% for appointment in appointments %}
+                        <div class="col-sm-auto">
+                            <div class="row">
+                                <div class="card" style="width: {{ appointment.schedule_card_width }}em">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ appointment.patient_details.first_name }} {{ appointment.patient_details.last_name }}</h5>
+                                        <div class="card-text" style="height: 10em">
+                                            <div class="row">
+                                                <span class="fa-stack" style="vertical-align: top; margin-left: 0.5em; color: steelblue">
+                                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                                    <i class="fas fa-clinic-medical fa-stack-1x fa-inverse"></i>
+                                                </span>
+                                                <div style="margin-left: 0.5em; margin-top: 0.3em;"><p>{{ appointment.office_details.name }}</p></div>
+                                            </div>
+                                            <div class="row">
+                                                <span class="fa-stack" style="vertical-align: top; margin-left: 0.5em; color: steelblue">
+                                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                                    <i class="fas fa-stethoscope fa-stack-1x fa-inverse"></i>
+                                                </span>
+                                                <div style="margin-left: 0.5em; margin-top: 0.3em;"><p>{{ appointment.exam_room_details.name }}</p></div>
+                                            </div>
+                                            <div class="row" data-toggle="tooltip" data-placement="bottom" title="
+                                                {% if appointment.checked_in_time %}
+                                                    Checked in at {{ appointment.checked_in_time }}
+                                                {% endif%}
+                                            ">
+                                                {% if appointment.wait_time %}
+                                                    <span class="fa-stack" style="vertical-align: top; margin-left: 0.5em; color: steelblue">
+                                                        <i class="fas fa-circle fa-stack-2x"></i>
+                                                        <i class="fas fa-hourglass-half fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                    <div style="margin-left: 0.5em; margin-top: 0.3em;"><p>{{ appointment.wait_time }} min</p></div>
+                                                {% endif%}
+                                            </div>
                                         </div>
-                                        <div class="row">
-                                            <span class="fa-stack" style="vertical-align: top; margin-left: 0.5em;">
-                                                <i class="fas fa-circle fa-stack-2x"></i>
-                                                <i class="fas fa-stethoscope fa-stack-1x fa-inverse"></i>
-                                            </span>
-                                            <div style="margin-left: 0.5em; margin-top: 0.3em;"><p>{{ appointment.exam_room_details.name }}</p></div>
-                                        </div>
-                                        <div class="row">
-                                            <div style="margin-left: 0.5em; margin-top: 0.3em;"><p>{{ appointment.notes }}</p></div>
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#appointment{{appointment.id}}_info">
+                                            Appointment Info
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#patient{{ appointment.patient_details.id }}_info">
+                                            Patient Info
+                                        </button>
+                                        <div class="row duration type2">
+                                            <div class="col-6" style="text-align: left">
+                                                <p>
+                                                    <span class="fa-stack" style="font-size: 0.5em;">
+                                                        <i class="fas fa-clock fa-stack-2x"></i>
+                                                    </span>
+                                                    <small>{{ appointment.duration }} min</small>
+                                                </p>
+                                            </div>
+                                            <div class="col-6" style="text-align: right;">
+                                                {% if appointment.status == "Arrived" %}
+                                                    <span class="badge badge-primary">Arrived</span>
+                                                {% elif appointment.status == "Checked In" %}
+                                                    <span class="badge badge-info">Checked In</span>
+                                                {% elif appointment.status == "In Room" %}
+                                                    <span class="badge badge-success">In Room</span>
+                                                {% elif appointment.status == "In Session" %}
+                                                    <span class="badge badge-info">In Session</span>
+                                                {% elif appointment.status == "Complete" %}
+                                                    <span class="badge badge-success">Complete</span>
+                                                {% elif appointment.status == "Confirmed" %}
+                                                    <span class="badge badge-info">Confirmed</span>
+                                                {% elif appointment.status == "Not Confirmed" %}
+                                                    <span class="badge badge-secondary">Not Confirmed</span>
+                                                {% elif appointment.status == "No Show" %}
+                                                    <span class="badge badge-warning">No Show</span>
+                                                {% elif appointment.status == "Rescheduled" %}
+                                                    <span class="badge badge-warning">Rescheduled</span>
+                                                {% elif appointment.status == "Cancelled" %}
+                                                    <span class="badge badge-danger">Cancelled</span>
+                                                {% else %}
+                                                    <span class="badge badge-light">Info N/A</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
-                                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                                    <div class="row duration">
-                                        <div class="col-6" style="text-align: left">
-                                            <p>
-                                                <span class="fa-stack" style="font-size: 0.5em;">
-                                                    <i class="fas fa-clock fa-stack-2x"></i>
-                                                </span>
-                                                <small>{{ appointment.duration }} min</small>
-                                            </p>
+                                    
+                                </div>
+                            </div>
+                            <div class="row"><div class="triangle-up"></div></div>
+                            <div class="row top_edge"><p><small>{{ appointment.scheduled_time|time:"g:i a"}}</small></p></div>
+                        </div>
+
+                        <!-- Modal1 -->
+                        <div class="modal fade" id="patient{{ appointment.patient_details.id }}_info" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <form action="/change_patient_info/" method="POST"> {% csrf_token %}
+                                <input type="hidden" name="patient" value="{{ appointment.patient_details.id }}">
+                                <input type="hidden" name="role" value="doctor">
+                                <div class="modal-header">
+                                    <h5>Patient Details</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-sm-4 justify-content-center d-flex align-items-center">
+                                                <div class="profile_photo" style="margin-bottom: 1em">
+                                                    <img src="{{ appointment.patient_details.patient_photo }}" class="rounded mx-auto d-block profile_photo" alt="Profile Photo">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <div class="form-group row">
+                                                    <label class="col-sm-5 col-form-label" for="exampleFormControlSelect1">First Name:</label>
+                                                    <input type="text" value={{ appointment.patient_details.first_name }} class="col-sm-7 form-control" id="formGroupExampleInput" name="first_name" placeholder="First Name">
+                                                </div>
+                                                
+                                                <div class="form-group row">
+                                                    <label class="col-sm-5 col-form-label" for="exampleFormControlSelect1">Last Name:</label>
+                                                    <input type="text" value={{ appointment.patient_details.last_name }} class="col-sm-7 form-control" id="formGroupExampleInput" name="last_name" placeholder="Last Name">
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label class="col-sm-5 col-form-label" for="exampleFormControlSelect1">Gender:</label>
+                                                    <select class="form-control col-sm-7" id="inputGroupSelect02" name="gender">
+                                                        <option selected value="{{ appointment.patient_details.gender}}">{{ appointment.patient_details.gender }}</option>
+                                                        {% if appointment.patient_details.gender != "Male" %}
+                                                            <option value="Male">Male</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.gender != "Female" %}
+                                                            <option value="Female">Female</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.gender != "Other" %}
+                                                            <option value="Other">Other</option>
+                                                        {% endif %}
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-6" style="text-align: right">
-                                            {% if appointment.status == "Arrived" %}
-                                                <span class="badge badge-primary">Arrived</span>
-                                            {% elif appointment.status == "Checked In" %}
-                                                <span class="badge badge-info">Checked In</span>
-                                            {% elif appointment.status == "In Room" %}
-                                                <span class="badge badge-success">In Room</span>
-                                            {% elif appointment.status == "In Session" %}
-                                                <span class="badge badge-info">In Session</span>
-                                            {% elif appointment.status == "Complete" %}
-                                                <span class="badge badge-success">Complete</span>
-                                            {% elif appointment.status == "Confirmed" %}
-                                                <span class="badge badge-info">Confirmed</span>
-                                            {% elif appointment.status == "Not Confirmed" %}
-                                                <span class="badge badge-secondary">Not Confirmed</span>
-                                            {% elif appointment.status == "No Show" %}
-                                                <span class="badge badge-warning">No Show</span>
-                                            {% elif appointment.status == "Rescheduled" %}
-                                                <span class="badge badge-warning">Rescheduled</span>
-                                            {% elif appointment.status == "Cancelled" %}
-                                                <span class="badge badge-danger">Cancelled</span>
-                                            {% else %}
-                                                <span class="badge badge-light">Info N/A</span>
-                                            {% endif %}
+                                        
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="form-group row">
+                                                    <label class="col-sm-4 col-form-label" for="exampleFormControlSelect1">Date of Birth:</label>
+                                                    <select class="form-control col-sm-2" id="inputGroupSelect02" name="month">
+                                                        <option selected value="{{ appointment.patient_details.date_of_birth|slice:"5:7" }}">
+                                                            {% if appointment.patient_details.date_of_birth|slice:"5:7" == "01"%}Jan
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "02"%}Feb
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "03"%}Mar
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "04"%}Apr
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "05"%}May
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "06"%}Jun
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "07"%}Jul
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "08"%}Aug
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "09"%}Sep
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "10"%}Oct
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "11"%}Nov
+                                                            {% elif appointment.patient_details.date_of_birth|slice:"5:7" == "12"%}Dec
+                                                            {% endif %}
+                                                        </option>
+                                                        <option value="01">Jan</option>
+                                                        <option value="02">Feb</option>
+                                                        <option value="03">Mar</option>
+                                                        <option value="04">Apr</option>
+                                                        <option value="05">May</option>
+                                                        <option value="06">Jun</option>
+                                                        <option value="07">Jul</option>
+                                                        <option value="08">Aug</option>
+                                                        <option value="09">Sep</option>
+                                                        <option value="10">Oct</option>
+                                                        <option value="11">Nov</option>
+                                                        <option value="12">Dec</option>
+                                                    </select>
+                                                    <select class="form-control col-sm-3" id="inputGroupSelect02" name="day">
+                                                        <option selected value="{{ appointment.patient_details.date_of_birth|slice:"8:10" }}">{{ appointment.patient_details.date_of_birth|slice:"8:10" }}</option>
+                                                        <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option>
+                                                        <option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option>
+                                                        <option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                                                        <option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="15">15</option>
+                                                        <option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="19">19</option>
+                                                        <option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option>
+                                                        <option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option>
+                                                        <option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                                                    </select>
+                                                    <input type="text" value="{{ appointment.patient_details.date_of_birth|slice:"0:4" }}" class="col-sm-3 form-control" id="formGroupExampleInput" name="year">
+                                                </div>
+                                            </div>
                                         </div>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                    <span class="input-group-text input_text_style" style="width: 7em;" id="inputGroup-sizing">Email:</span>
+                                                    </div>
+                                                    <input name="email" value="{{ appointment.patient_details.email }}" type="email" class="form-control" placeholder="Email" aria-label="email" aria-describedby="inputGroup-sizing">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                    <span class="input-group-text input_text_style" style="width: 7em;" id="inputGroup-sizing">Cell Phone:</span>
+                                                    </div>
+                                                    <input name="cell_phone" value="{{ appointment.patient_details.cell_phone }}" type="text" class="form-control" placeholder="Cell Phone" aria-label="cell_phone" aria-describedby="inputGroup-sizing">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                    <span class="input-group-text input_text_style" style="width: 7em;" id="inputGroup-sizing">Address:</span>
+                                                    </div>
+                                                    <input name="address" value="{{ appointment.patient_details.address }}" type="text" class="form-control" placeholder="Address" aria-label="address" aria-describedby="inputGroup-sizing">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                    <span class="input-group-text input_text_style" style="width: 7em;" id="inputGroup-sizing">City:</span>
+                                                    </div>
+                                                    <input name="city" value="{{ appointment.patient_details.city }}" type="text" class="form-control" placeholder="City" aria-label="city" aria-describedby="inputGroup-sizing">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                    <span class="input-group-text input_text_style" id="inputGroup-sizing">State:</span>
+                                                    </div>
+                                                    <input name="state" value="{{ appointment.patient_details.state }}" type="text" class="form-control" placeholder="State" aria-label="state" aria-describedby="inputGroup-sizing">
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                    <span class="input-group-text input_text_style" style="width: 7em;" id="inputGroup-sizing">Zipcode:</span>
+                                                    </div>
+                                                    <input name="zip_code" value="{{ appointment.patient_details.zip_code }}" type="text" class="form-control" placeholder="Zipcode" aria-label="zip_code" aria-describedby="inputGroup-sizing">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text input_text_style" id="inputGroup-sizing">Ethnicity:</span>
+                                                    </div>
+                                                    <select class="form-control col-sm-7" id="inputGroupSelect02" name="ethnicity">
+                                                        <option selected value="{{ appointment.patient_details.ethnicity}}">
+                                                            {% if appointment.patient_details.ethnicity == "blank" %}Blank
+                                                            {% elif appointment.patient_details.ethnicity == "hispanic" %}Hispanic
+                                                            {% elif appointment.patient_details.ethnicity == "not_hispanic" %}Not Hispanic
+                                                            {% elif appointment.patient_details.ethnicity == "declined" %}Declined
+                                                            {% endif %}
+                                                        </option>
+                                                        {% if appointment.patient_details.ethnicity != "blank" %}
+                                                            <option value="blank">Blank</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.ethnicity != "hispanic" %}
+                                                            <option value="hispanic">Hispanic</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.ethnicity != "not_hispanic" %}
+                                                            <option value="not_hispanic">Not Hispanic</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.ethnicity != "declined" %}
+                                                            <option value="declined">Declined</option>
+                                                        {% endif %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text input_text_style" id="inputGroup-sizing">Race:</span>
+                                                    </div>
+                                                    <select class="form-control col-sm-7" id="inputGroupSelect02" name="race">
+                                                        <option selected value="{{ appointment.patient_details.race}}">
+                                                            {% if appointment.patient_details.race == "blank" %}Blank
+                                                            {% elif appointment.patient_details.race == "indian" %}Indian
+                                                            {% elif appointment.patient_details.race == "asian" %}Asian
+                                                            {% elif appointment.patient_details.race == "black" %}Black
+                                                            {% elif appointment.patient_details.race == "hawaiian" %}Hawaiian
+                                                            {% elif appointment.patient_details.race == "white" %}White
+                                                            {% elif appointment.patient_details.race == "declined" %}Declined
+                                                            {% endif %}
+                                                        </option>
+                                                        {% if appointment.patient_details.race != "blank" %}
+                                                            <option value="blank">Blank</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.race != "indian" %}
+                                                            <option value="indian">Indian</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.race != "asian" %}
+                                                            <option value="asian">Asian</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.race != "black" %}
+                                                            <option value="black">Black</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.race != "hawaiian" %}
+                                                            <option value="hawaiian">Hawaiian</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.race != "white" %}
+                                                            <option value="white">White</option>
+                                                        {% endif %}
+                                                        {% if appointment.patient_details.race != "declined" %}
+                                                            <option value="declined">Declined</option>
+                                                        {% endif %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12 text-center"><h5>Emergency Contact:</h5></div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend fixed-input-label">
+                                                    <span class="input-group-text input_text_style" style="width: 6em;" id="inputGroup-sizing">Name:</span>
+                                                    </div>
+                                                    <input name="emergency_contact_name" value="{{ appointment.patient_details.emergency_contact_name }}" type="text" class="form-control" placeholder="Name" aria-label="emergency_contact_name" aria-describedby="inputGroup-sizing">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend fixed-input-label">
+                                                    <span class="input-group-text input_text_style" style="width: 6em;" id="inputGroup-sizing">Phone:</span>
+                                                    </div>
+                                                    <input name="emergency_contact_phone" value="{{ appointment.patient_details.emergency_contact_phone }}" type="text" class="form-control" placeholder="Phone" aria-label="emergency_contact_phone" aria-describedby="inputGroup-sizing">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="input-group input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                    <span class="input-group-text input_text_style" style="width: 6em;" id="inputGroup-sizing">Relation:</span>
+                                                    </div>
+                                                    <input name="emergency_contact_relation" value="{{ appointment.patient_details.emergency_contact_relation }}" type="text" class="form-control" placeholder="Relation" aria-label="emergency_contact_relation" aria-describedby="inputGroup-sizing">
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
-                                
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                                </form>
+                            </div>
                             </div>
                         </div>
-                        <div class="row"><div class="triangle-up"></div></div>
-                        <div class="row top_edge"><p><small>{{ appointment.scheduled_time|time:"g:i a"}}</small></p></div>
+
+                        <!-- Modal2 -->
+                        <div class="modal fade" id="appointment{{appointment.id}}_info" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <form action="/change_appointment_info/" method="POST"> {% csrf_token %}
+                                <input type="hidden" name="appointment" value="{{ appointment.id }}">
+                                <input type="hidden" name="role" value="doctor">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalCenterTitle">
+                                        {{ appointment.patient_details.first_name }} {{ appointment.patient_details.last_name }}
+                                    </h5>
+                                    <button type="button " class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container">
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label" for="exampleFormControlSelect1">Status:</label>
+                                            <select class="form-control col-sm-10" id="inputGroupSelect02" name="status">
+                                                <option selected value="{{ appointment.status }}">
+                                                    {% if appointment.status == "Arrived" %}Arrived
+                                                    {% elif appointment.status == "Checked In" %}Checked In
+                                                    {% elif appointment.status == "In Room" %}In Room
+                                                    {% elif appointment.status == "In Session" %}In Session
+                                                    {% elif appointment.status == "Complete" %}Complete
+                                                    {% elif appointment.status == "Confirmed" %}Confirmed
+                                                    {% elif appointment.status == "Not Confirmed" %}Not Confirmed
+                                                    {% elif appointment.status == "No Show" %}No Show
+                                                    {% elif appointment.status == "Rescheduled" %}Rescheduled
+                                                    {% elif appointment.status == "Cancelled" %}Cancelled
+                                                    {% else %}Info N/A
+                                                    {% endif %}
+                                                </option>
+                                                {% if appointment.status != "Arrived" %}<option>Arrived</option>
+                                                {% endif %}
+                                                {% if appointment.status != "Checked In" %}<option>Checked In</option>
+                                                {% endif %}
+                                                {% if appointment.status != "In Room" %}<option>In Room</option>
+                                                {% endif %}
+                                                {% if appointment.status != "In Session" %}<option>In Session</option>
+                                                {% endif %}
+                                                {% if appointment.status != "Complete" %}<option>Complete</option>
+                                                {% endif %}
+                                                {% if appointment.status != "Confirmed" %}<option>Confirmed</option>
+                                                {% endif %}
+                                                {% if appointment.status != "Not Confirmed" %}<option>Not Confirmed</option>
+                                                {% endif %}
+                                                {% if appointment.status != "No Show" %}<option>No Show</option>
+                                                {% endif %}
+                                                {% if appointment.status != "Rescheduled" %}<option>Rescheduled</option>
+                                                {% endif %}
+                                                {% if appointment.status != "Cancelled" %}<option>Cancelled</option>
+                                                {% endif %}
+                                                {% if appointment.status != "Info N/A" %}<option>Info N/A</option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label" for="exampleFormControlSelect1">Time:</label>
+                                            <select class="form-control col-sm-2" id="inputGroupSelect02" name="hours">
+                                                <option selected value="{{ appointment.scheduled_time|time:"g"}}">{{ appointment.scheduled_time|time:"g"}}</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                            </select>
+                                            <select class="form-control col-sm-2" id="inputGroupSelect02" name="minutes">
+                                                <option selected value="{{ appointment.scheduled_time|time:"i"}}">{{ appointment.scheduled_time|time:"i"}}</option>
+                                                <option value="00">00</option>
+                                                <option value="15">15</option>
+                                                <option value="30">30</option>
+                                                <option value="45">45</option>
+                                            </select>
+                                            <select class="form-control col-sm-2" id="inputGroupSelect02" name="ampm">
+                                                <option selected value="{{ appointment.scheduled_time|time:"A"}}">{{ appointment.scheduled_time|time:"A"}}</option>
+                                                <option value="AM">AM</option>
+                                                <option value="PM">PM</option>
+                                            </select>
+                                            <label class="col-sm-2 col-form-label" for="exampleFormControlSelect1">Duration(min):</label>
+                                            <input type="text" value={{ appointment.duration }} class="col-sm-2 form-control" id="formGroupExampleInput" name="duration">
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label" for="exampleFormControlSelect1">Office:</label>
+                                            <select class="form-control col-sm-10" id="inputGroupSelect02" name="office_exam_room">
+                                                <option selected value="{{ appointment.office_details.id }} {{ appointment.exam_room_details.index}}">{{ appointment.office_details.name }} - {{ appointment.exam_room_details.name }}</option>
+                                                {% for office_id, office_value in offices.items %}
+                                                  {% for exam_room_index, exam_room_value in office_value.exam_rooms.items %} 
+                                                        {% if office_id != appointment.office_details.id or exam_room_index != appointment.exam_room_details.index %}
+                                                            <option value="{{ office_id }} {{ exam_room_index }}">{{ office_value.name }} - {{ exam_room_value.name }}</option>
+                                                        {% endif %}
+                                                  {% endfor %}
+                                                {% endfor %}
+                                              </select>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label class="col-sm-2" for="exampleFormControlTextarea1">Notes:</label>
+                                            <textarea class="form-control col-sm-10" id="exampleFormControlTextarea1" rows="3" name = "notes">{{ appointment.notes }}</textarea>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label class="col-sm-2" for="exampleFormControlTextarea1">Reason:</label>
+                                            <textarea class="form-control col-sm-10" id="exampleFormControlTextarea1" rows="3" name = "reason">{{ appointment.reason }}</textarea>
+                                        </div>
+
+                                        <div class="row text-center">
+                                            <div class="col-12"><h5>Status Records:</h5></div>
+                                        </div>
+                                        <table class="table">
+                                            <thead>
+                                              <tr>
+                                                <th scope="col">Date & Time</th>
+                                                <th scope="col">From</th>
+                                                <th scope="col">To</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for record in appointment.status_transitions %}
+                                                <tr>
+                                                <td>{{ record.datetime}}</td>
+                                                <td>{{ record.from_status }}</td>
+                                                <td>{{ record.to_status }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                          </table>
+
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                                </form>
+                            </div>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                </div>
+                {% else %}
+                    <div class="row text-center">
+                        <div class="col-12 align-middle">
+                            <h5>No appointment today.</h5>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
-
-    <br><br><br><br><br><br>
-    <div class="container">
-        <span class="badge badge-primary">Arrived</span>
-        <h1>Test Area {{ doctor.first_name }} {{ doctor.last_name }}</h1>
-        {% now "jS F Y H:i" %}
-        {% for appointment in appointments %}
-        <p>{{ appointment.scheduled_time|time:"g:i a"}} {{ appointment.duration }} {{ appointment.vitals }} </p>
-            {{appointment.notes}}
-        {% endfor %}
-    </div>
-</body>
-
-</html>
+{% endblock %}
